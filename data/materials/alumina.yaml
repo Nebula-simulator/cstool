@@ -1,0 +1,27 @@
+name:           alumina
+density:        3.98 g/cm³
+
+elements:
+    Al: { count: 2, Z: 13, M: 26.982 g/mol }
+    O:  { count: 3, Z:  8, M: 15.999 g/mol }
+
+band_structure:
+    model:      insulator
+    valence:    3.64 eV                 # doi:10.1021/acs.jpcc.5b06843
+    band_gap:   7.0 eV                  # doi:10.1021/acs.jpcc.5b06843
+    affinity:   3.71 eV                 # doi:10.1063/1.474085 (on clusters)
+
+optical:
+    df_file:   elf/df_Al2O3.dat
+
+phonon:
+    lattice:    4.76 Å
+
+    isotropic:
+        ac_def: 13.0 eV                 # doi:10.1103/PhysRevLett.90.247401
+
+    longitudinal:
+        c_s:    11003 m/s               # https://srdata.nist.gov/CeramicDataPortal/Pds/Scdaos (sintered alumina)
+
+    transversal:
+        c_s:    6512 m/s                # https://srdata.nist.gov/CeramicDataPortal/Pds/Scdaos (sintered alumina)

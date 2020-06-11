@@ -1,0 +1,29 @@
+name:           pmma
+density:        1.192 g/cm³
+
+elements:
+    H: { count: 8, Z: 1, M:  1.008 g/mol }
+    C: { count: 5, Z: 6, M: 12.011 g/mol }
+    O: { count: 2, Z: 8, M: 15.999 g/mol }
+
+band_structure:
+    model:      insulator
+    valence:    0 eV
+    band_gap:   5.6 eV
+    affinity:   2.5 eV
+
+optical:
+    df_file:       elf/df_PMMA.dat
+
+phonon:
+    lattice:    1.54 Å      # C-C bond length
+
+    isotropic:
+        ac_def: 2 eV        # Unknown
+
+    longitudinal:
+        c_s:    2746 m/s    # D. Christman, General Motors (1972), https://apps.dtic.mil/dtic/tr/fulltext/u2/743547.pdf
+
+    transversal:
+        c_s:    1392 m/s    # D. Christman, General Motors (1972), https://apps.dtic.mil/dtic/tr/fulltext/u2/743547.pdf
+

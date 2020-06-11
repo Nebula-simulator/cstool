@@ -1,0 +1,22 @@
+name:           silicondioxide
+density:        2.648 g/cm³
+
+elements:
+    Si: { count: 1, Z: 14, M: 28.085 g/mol }
+    O:  { count: 2, Z:  8, M: 15.999 g/mol }
+
+band_structure:
+    model:      insulator
+    valence:    0 eV
+    band_gap:   9 eV
+    affinity:   0.9 eV
+
+optical:
+    df_file:       elf/df_SiO2.dat
+
+phonon:
+    lattice:    5.45 Å
+
+    isotropic:
+        c_s:    3.560 km/s
+        ac_def: 2.6 eV

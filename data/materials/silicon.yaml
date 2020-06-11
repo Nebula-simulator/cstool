@@ -1,0 +1,29 @@
+name:           silicon
+density:        2.3290 g/cm³
+
+elements:
+    Si: { count: 1, Z: 14, M: 28.0855 g/mol }
+
+band_structure:
+    model:      semiconductor
+    valence:    7.27 eV
+    band_gap:   1.12 eV
+    affinity:   4.05 eV
+
+optical:
+    df_file:    elf/df_Si.dat
+
+phonon:
+    lattice:    5.430710 Å
+    m_dos:      1.08 m_e
+    m_eff:      0.26 m_e
+
+    longitudinal:
+        alpha:  2.00e-7 m²/s
+        c_s:    9130 m/s     # Landolt-Bornstein Vol. III/41A1a 872
+        ac_def: 9.2 eV       # Landolt-Bornstein Vol. III/41A1a 648
+
+    transversal:
+        alpha:  2.26e-7 m²/s
+        c_s:    5842 m/s     # Landolt-Bornstein Vol. III/41A1a 872
+        ac_def: 5.0 eV       # Landolt-Bornstein Vol. III/41A1a 648

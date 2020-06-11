@@ -1,0 +1,20 @@
+name:              copper
+density:           8.96 g/cm³
+
+elements:
+    Cu: { count: 1, Z: 29, M: 63.546 g/mol }
+
+band_structure:
+    model:         metal
+    fermi:         7.0 eV
+    work_function: 4.53 eV
+
+optical:
+    df_file:       elf/df_Cu.dat
+
+phonon:
+    lattice:       3.597 Å
+
+    isotropic:
+        c_s:       4.6 km/s
+        ac_def:    8.92 eV

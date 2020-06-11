@@ -1,0 +1,26 @@
+name:                gold
+density:             19.30 g/cm³
+
+elements:
+    Au: { count: 1, Z: 79, M: 196.97 g/mol }
+
+band_structure:
+    model:           metal
+    fermi:           5.53 eV
+    work_function:   5.38 eV
+
+optical:
+    df_file:         elf/df_Au.dat
+
+phonon:
+    model:           dual
+    lattice:         4.0782 Å
+
+    isotropic:
+        resistivity: 2.44e-8 Ω m
+
+    longitudinal:
+        c_s:         3240 m/s
+
+    transversal:
+        c_s:         1200 m/s

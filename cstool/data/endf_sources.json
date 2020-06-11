@@ -1,0 +1,14 @@
+{
+	"atomic_relax": {
+		"url":  "http://www.nndc.bnl.gov/endf/b7.1/zips/ENDF-B-VII.1-atomic_relax.zip",
+		"sha1": "8f1d2aa39b0d2705635a7d474cf05d1c79b13564"
+	},
+	"electrons": {
+		"url":  "http://www.nndc.bnl.gov/endf/b7.1/zips/ENDF-B-VII.1-electrons.zip",
+		"sha1": "6c532bcf3f650c2a696574306d85e01fdda24b15"
+	},
+	"photoat": {
+		"url":  "http://www.nndc.bnl.gov/endf/b7.1/zips/ENDF-B-VII.1-photoat.zip",
+		"sha1": "ae0ba033e0ee01e6c06c07fa6eb9de552ef139f7"
+	}
+}
