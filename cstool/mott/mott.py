@@ -9,7 +9,8 @@ from .run_elsepa import run_elscata
 
 # Pint does not support numpy.array_split...
 def pint_array_split(array, indices_or_sections):
-	return np.array_split(array.magnitude, indices_or_sections) * array.units
+	split = np.array_split(array.magnitude, indices_or_sections)
+	return [s * array.units for s in split]
 
 def run_elscata_helper(Z, energies):
 	# There are no muffin-potential radii for atomic numbers 1, 7, 8
