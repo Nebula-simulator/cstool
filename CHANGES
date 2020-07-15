@@ -1,0 +1,8 @@
+cstool changelog
+
+1.0.1 (2020-07-14)
+  - Fix VisibleDeprecationWarning introduced with numpy 1.19
+  - Fix several compatibility issues with recent pint & old numpy versions
+
+1.0.0 (2020-06-11)
+  - Initial release
