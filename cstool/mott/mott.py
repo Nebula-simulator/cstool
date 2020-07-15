@@ -12,6 +12,10 @@ def pint_array_split(array, indices_or_sections):
 	split = np.array_split(array.magnitude, indices_or_sections)
 	return [s * array.units for s in split]
 
+# Pint's implementation of numpy.allclose does not work with old versions of numpy
+def pint_allclose(a, b, *args, **kwargs):
+	return np.allclose(a.magnitude, b.to(a.units).magnitude, *args, **kwargs)
+
 def run_elscata_helper(Z, energies):
 	# There are no muffin-potential radii for atomic numbers 1, 7, 8
 	no_muffin_Z = [1, 7, 8]
@@ -78,7 +82,7 @@ def mott_dimfp(material_params, energies, threads=4):
 			dimfp[iE] += elsepa_data[iZ][iE].DCS * element.count * material_params.get_rho_n()
 
 			# Sanity check
-			if not np.allclose(theta, elsepa_data[iZ][iE].THETA):
+			if not pint_allclose(theta, elsepa_data[iZ][iE].THETA):
 				raise RuntimeError("ELSEPA is unexpectedly returning different"
 					" scattering angles for different atomic numbers/energies."
 					" Please contact the developers.")

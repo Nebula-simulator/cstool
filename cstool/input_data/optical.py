@@ -27,7 +27,7 @@ class optical:
 
 	def get_outer_shells(self):
 		if hasattr(self, 'outer_shells'):
-			return np.copy(self.outer_shells)
+			return np.copy(self.outer_shells.magnitude) * self.outer_shells.units
 		else:
 			return np.array([])*units.eV
 

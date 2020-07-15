@@ -18,7 +18,7 @@ def icdf(x, cdf, P):
 
 	# Make sure to only pass points where the CDF has changed.
 	OK = np.r_[True, cdf[1:] != cdf[:-1]]
-	return np.interp(P, cdf[OK], x[OK])
+	return np.interp(P, cdf[OK], x[OK].magnitude) * x.units
 
 
 def compute_tcs_icdf(f, P, eval_x):

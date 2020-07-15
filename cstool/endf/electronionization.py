@@ -101,7 +101,7 @@ def compile_electronionization_icdf(material_params, K, omega_frac, P):
 	total_DIMFP = np.zeros(omega.shape) / units.nm / units.eV
 	for shell in shells:
 		total_DIMFP += shell['DIMFP']
-		shell['DIMFP_cum'] = np.copy(total_DIMFP)
+		shell['DIMFP_cum'] = np.copy(total_DIMFP.magnitude) * total_DIMFP.units
 	for shell in shells:
 		shell['P_cum'] = np.divide(shell['DIMFP_cum'], total_DIMFP,
 			out = np.zeros(shell['DIMFP_cum'].shape),

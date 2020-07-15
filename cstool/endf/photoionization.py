@@ -69,7 +69,7 @@ def compile_photoionization_icdf(material_params, K, p_ion):
 	total_IMFP = np.zeros(K.shape)
 	for shell in shells:
 		total_IMFP += shell['IMFP']
-		shell['IMFP_cum'] = np.copy(total_IMFP)
+		shell['IMFP_cum'] = np.copy(total_IMFP.magnitude) * total_IMFP.units
 	# shell['P_cum'] is the cumulative probability for this shell and others before it.
 	for shell in shells:
 		shell['P_cum'] = np.divide(shell['IMFP_cum'], total_IMFP,

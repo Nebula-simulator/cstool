@@ -62,6 +62,8 @@ def interpolate_f(f1, f2, a, b, h = lambda x : x):
         ym = (1 - w) * y1 + w * y2
 
         return np.where(
-            x < a, y1, np.where(
-                x > b, y2, ym))
+				x < a, y1.to(ym.units).magnitude,
+			np.where(
+                x > b, y2.to(ym.units).magnitude,
+					ym.magnitude)) * ym.units
     return g
