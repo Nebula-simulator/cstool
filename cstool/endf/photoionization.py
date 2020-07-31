@@ -77,7 +77,7 @@ def compile_photoionization_icdf(material_params, K, p_ion):
 			where = total_IMFP > 0*total_IMFP.units)
 
 	# Compute ICDF from P_cum.
-	ionization_icdf = np.empty((K.shape[0], p_ion.shape[0]))*units.eV
+	ionization_icdf = np.zeros((K.shape[0], p_ion.shape[0]))*units.eV
 	ionization_icdf[:] = np.nan
 	for shell in reversed(shells):
 		ionization_icdf[np.logical_and(
