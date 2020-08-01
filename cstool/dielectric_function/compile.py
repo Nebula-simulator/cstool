@@ -1,6 +1,7 @@
 import numpy as np
+from scipy.integrate import cumtrapz
 from cstool.common import units
-from cstool.common.icdf_compile import compute_tcs_icdf, compute_2d_tcs_icdf
+from cstool.common.icdf_compile import icdf, compute_tcs_icdf
 
 @units.check(None, units.eV, units.dimensionless)
 def compile_ashley_imfp_icdf(dimfp, K, P_omega):
@@ -91,7 +92,7 @@ def compile_full_imfp_icdf(elf_omega, elf_q, elf_data,
 	# momentum boundaries from kinetic energy
 	q_k = lambda _k : np.sqrt(2*units.m_e * _k*(1 + _k/(2 * mc2))) / units.hbar;
 
-	def dcs(omega, q):
+	def elf(omega, q):
 		# Linear interpolation, with extrapolation if out of bounds
 		def find_index(a, v):
 			low_i = np.clip(np.searchsorted(a, v, side='right')-1, 0, len(a)-2)
@@ -106,7 +107,17 @@ def compile_full_imfp_icdf(elf_omega, elf_q, elf_data,
 			frac_x*frac_y * elf_data[low_x+1, low_y+1]
 
 		elf[elf <= 0] = 0
-		return elf / q
+		return elf
+
+	def q_part(eval_omega, eval_q):
+		# Returns DCS[i,j] = ∫_0^{eval_q[j]} dq/q ELF(eval_omega[i], q)
+		dcs_data = np.divide(
+			elf(eval_omega[:,np.newaxis], eval_q),
+			eval_q.magnitude)
+		for i in range(len(eval_omega)):
+			dcs_data[i,1:] = cumtrapz(dcs_data[i,:], eval_q.magnitude)
+			dcs_data[i,0] = 0
+		return dcs_data
 
 	eval_omega = np.geomspace(
 		elf_omega[0].to(K_units).magnitude,
@@ -116,14 +127,15 @@ def compile_full_imfp_icdf(elf_omega, elf_q, elf_data,
 		q_k(elf_omega[0]).to(q_units).magnitude,
 		2*q_k(K[-1]).to(q_units).magnitude,
 		10000) * q_units
-	dcs_data = dcs(eval_omega[:,np.newaxis], eval_q)
+	dcs_data = q_part(eval_omega, eval_q)
 
 	inel_imfp = np.zeros(K.shape) * units('nm^-1')
 	inel_omega_icdf = np.zeros((K.shape[0], P_omega.shape[0])) * K_units
 	inel_q_2dicdf = np.zeros((K.shape[0], n_omega_q, P_q.shape[0])) * q_units
 
 	for i, E in enumerate(K):
-		tcs, omega_icdf, q_2dicdf = compute_2d_tcs_icdf(dcs_data[eval_omega<E-F,:],
+		tcs, omega_icdf, q_2dicdf = tcs_2dicdf(
+			dcs_data[eval_omega<E-F,:],
 			eval_omega[eval_omega < E-F], eval_q,
 			lambda omega : q_k(E) - q_k(np.maximum(0*units.eV, E-omega)),
 			lambda omega : q_k(E) + q_k(np.maximum(0*units.eV, E-omega)),
@@ -139,3 +151,87 @@ def compile_full_imfp_icdf(elf_omega, elf_q, elf_data,
 	print()
 
 	return inel_imfp, inel_omega_icdf, inel_q_2dicdf
+
+
+def tcs_2dicdf(function_data, # Cumulative integral of ELF over dq/q
+	eval_x, eval_y,           # ω and q values for which function_data was tabulated
+	y_low_f, y_high_f,        # Range of q values which are interesting
+	P_x,                      # Probability for ω ICDF
+	x2d_axis, P_y):           # Axes for q 2D ICDF
+	"""Compute integrated cross section and inverse cumulative distribution
+	functions (ICDFs) for an optical data model.
+
+	This function requires the energy-loss function, Im[-1/ε], to be
+	pre-integrated over dq/q (you should provide the cumulative integral). This
+	pre-integrated ELF is given to function_data, which should be a numpy array
+	of shape (len(eval_x), len(eval_y)). eval_x and eval_y represent the ω and q
+	values on which function_data has been evaluated.
+
+	y_low_f and y_high_f must be functions of eval_x. They should return the
+	minumum and maximum allowed q as function of ω.
+
+	This function returns:
+	  1. The total cross section, ∫dω ∫dq/q Im[1/ε]
+	  2. The ICDF for ω, for each P in P1d_axis.
+	  3. The ICDF for q given ω. First index is ω, from axis x2d_axis; second
+		 index is P, from P2d_axis.
+	"""
+
+	# Indices for integration boundaries
+	yi_low = np.searchsorted(eval_y.magnitude, y_low_f(eval_x).to(eval_y.units).magnitude)
+	yi_high = np.searchsorted(eval_y.magnitude, y_high_f(eval_x).to(eval_y.units).magnitude)
+
+	# CIx[i] = ∫_{eval_x[0]}^{eval_x[i]} dx' ∫_{y_low(x')}^{y_high(x')} dy' f(x', y')
+	#        = ∫_{eval_x[0]}^{eval_x[i]} dx' CIy_x[x', -1]
+	CIx = np.zeros(len(eval_x))
+	CIx[1:] = cumtrapz(
+		function_data[range(len(eval_x)),yi_high] - function_data[range(len(eval_x)),yi_low],
+		eval_x.magnitude)
+
+	# total_cs = ∫_{eval_x[0]}^{eval_x[-1]} dx' ∫_{y_low(x')}^{y_high(x')} dy' f(x', y')
+	#          = CIx[-1]
+	total_cs = CIx[-1]
+	if total_cs <= 0:
+		return (
+			0 * eval_x.units,
+			np.zeros(len(P_x)) * eval_x.units,
+			np.zeros((len(x2d_axis), len(P_y))) * eval_y.units
+		)
+
+	# CDF for x
+	# P[i] = ∫_{eval_x[0]}^{eval_x[i]} dx' p(x')
+	#      = ∫_{eval_x[0]}^{eval_x[i]} dx' ∫_{y_low(x')}^{y_high(x')} f(x', y') / total_cs
+	cPx = CIx / total_cs
+
+	# ICDF for omega
+	icdf_x = icdf(eval_x, cPx, P_x)
+
+	# ICDF for q
+	icdf_yx = np.zeros([len(x2d_axis), len(P_y)]) * eval_y.units
+	for j, xx in enumerate(x2d_axis):
+		i_eval_x = min(
+			np.searchsorted(eval_x.to(xx.units).magnitude, xx.magnitude),
+			len(eval_x) - 2)
+
+		if yi_low[i_eval_x] == yi_high[i_eval_x]:
+			cdf1 = np.zeros(len(eval_y))
+		else:
+			cdf1 = np.copy(function_data[i_eval_x])
+			cdf1 -= cdf1[yi_low[i_eval_x]]
+			cdf1 /= cdf1[yi_high[i_eval_x]]
+
+		if yi_low[i_eval_x+1] == yi_high[i_eval_x+1]:
+			cdf2 = np.zeros(len(eval_y))
+		else:
+			cdf2 = np.copy(function_data[i_eval_x+1])
+			cdf2 -= cdf2[yi_low[i_eval_x+1]]
+			cdf2 /= cdf2[yi_high[i_eval_x+1]]
+
+		frac = (xx - eval_x[i_eval_x]) / (eval_x[i_eval_x+1] - eval_x[i_eval_x])
+		cdf = (1 - frac)*cdf1.clip(0, 1) + frac*cdf2.clip(0, 1)
+		icdf_yx[j,:] = icdf(eval_y, cdf, P_y)
+
+	return (
+		total_cs * eval_x.units,
+		icdf_x,
+		icdf_yx)

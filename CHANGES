@@ -1,6 +1,7 @@
 cstool changelog
 
 1.0.2
+  - Speedup ICDF calculation for the Penn model
   - Fix 'invalid value encountered in multiply' warning
 
 1.0.1 (2020-07-14)
