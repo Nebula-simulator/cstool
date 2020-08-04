@@ -1,6 +1,6 @@
 import numpy as np
 from cstool.common import units
-from scipy.integrate import cumtrapz
+from scipy.integrate import trapz, cumtrapz
 
 def icdf(x, cdf, P):
 	"""Compute the Inverse Cumulative Distribution Function (ICDF), given the
@@ -20,7 +20,6 @@ def icdf(x, cdf, P):
 	OK = np.r_[True, cdf[1:] != cdf[:-1]]
 	return np.interp(P, cdf[OK], x[OK].magnitude) * x.units
 
-
 def compute_tcs_icdf(f, P, eval_x):
 	"""Compute the integrated cross section and ICDF for the one-dimensional
 	differential cross section function f(x). P represents the CDF probabilities
@@ -38,3 +37,15 @@ def compute_tcs_icdf(f, P, eval_x):
 	if cf[-1] <= 0*cf.units:
 		return 0*cf.units, np.zeros_like(P) * eval_x.units
 	return cf[-1], icdf(eval_x, cf/cf[-1], P)
+
+def compute_tcs(f, eval_x):
+	"""Compute the integrated cross section for the one-dimensional differential
+	cross section function f(x).
+
+	eval_x are the coordinates at which f is to be evaluated.
+
+	Returns the integrated cross section.
+	"""
+	eval_x *= units.dimensionless
+	y = f(eval_x) * units.dimensionless
+	return trapz(y.magnitude, eval_x.magnitude) * y.units * eval_x.units

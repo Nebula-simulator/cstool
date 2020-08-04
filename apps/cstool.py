@@ -5,7 +5,7 @@ from cstool.phonon import ac_phonon_dimfp, ac_phonon_loss
 from cstool.common import units
 from cstool.common.interpolate import interpolate_f
 from cstool.common import datafile
-from cstool.common.icdf_compile import compute_tcs_icdf
+from cstool.common.icdf_compile import compute_tcs, compute_tcs_icdf
 from cstool.dielectric_function import (
 	dimfp_kieft, compile_ashley_imfp_icdf,
 	elf_full_penn, compile_full_imfp_icdf)
@@ -31,13 +31,20 @@ def compile_kieft_elastic(outfile, material_params, K, P):
 	print("# Computing elastic total cross-sections and iCDFs.")
 	imfp = np.zeros(K.shape) * units('nm^-1')
 	icdf = np.zeros((K.shape[0], P.shape[0])) * units.dimensionless
+	tl = np.zeros(K.shape) * units.nm
 	for i, E in enumerate(K):
 		_imfp, _icdf = compute_tcs_icdf(
 			lambda costheta : elastic_cs_fn(E, costheta),
 			P,
 			np.linspace(-1, 1, 100000))
-		imfp[i] = 2*np.pi * _imfp.to('nm^-1')
+		imfp[i] = 2*np.pi * _imfp
 		icdf[i,:] = _icdf
+
+		_itl = 2 * np.pi * compute_tcs(
+			lambda costheta : elastic_cs_fn(E, costheta) * (1 - costheta),
+			np.linspace(-1, 1, 100000))
+		tl[i] = 1 / _itl
+
 		print('.', end='', flush=True)
 	print()
 
@@ -45,6 +52,7 @@ def compile_kieft_elastic(outfile, material_params, K, P):
 	group.add_scale("energy", K, 'eV')
 	group.add_dataset("imfp", imfp, ("energy",), 'nm^-1')
 	group.add_dataset("costheta_icdf", icdf, ("energy", None), '')
+	group.add_dataset("tl", tl, ("energy",), 'nm')
 
 
 def compile_kieft_inelastic(outfile, material_params, K, P):
