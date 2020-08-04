@@ -1,6 +1,6 @@
 cstool changelog
 
-1.0.2
+1.0.2 (2020-08-04)
   - Compute and store elastic transport length
   - Compute and store stopping power for Penn model
   - Speedup ICDF calculation for the Penn model
