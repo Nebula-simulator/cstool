@@ -1,6 +1,7 @@
 cstool changelog
 
 1.0.2
+  - Compute and store stopping power for Penn model
   - Speedup ICDF calculation for the Penn model
   - Fix 'invalid value encountered in multiply' warning
 

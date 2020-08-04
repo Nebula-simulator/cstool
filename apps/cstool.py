@@ -76,7 +76,7 @@ def compile_full_penn(outfile, material_params,
 	omega, q, elf = elf_full_penn(material_params, K[-1], 1200, 1000)
 
 	print("# Computing inelastic total cross-sections and iCDFs.")
-	imfp, omega_icdf, q_2dicdf = compile_full_imfp_icdf(
+	imfp, sp, omega_icdf, q_2dicdf = compile_full_imfp_icdf(
 		omega, q, elf,
 		K, P_omega, n_omega_q, P_q,
 		material_params.band_structure.get_fermi())
@@ -84,6 +84,7 @@ def compile_full_penn(outfile, material_params,
 	group = outfile.create_group("/full_penn")
 	group.add_scale("energy", K, 'eV')
 	group.add_dataset("imfp", imfp, ("energy",), 'nm^-1')
+	group.add_dataset("sp", sp, ("energy",), 'eV/nm')
 	group.add_dataset("omega_icdf", omega_icdf, ("energy", None), 'eV')
 	group.add_dataset("q_icdf", q_2dicdf, ("energy", None, None), 'nm^-1')
 

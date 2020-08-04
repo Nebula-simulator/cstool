@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.integrate import cumtrapz
+from scipy.integrate import trapz, cumtrapz
 from cstool.common import units
 from cstool.common.icdf_compile import icdf, compute_tcs_icdf
 
@@ -79,6 +79,7 @@ def compile_full_imfp_icdf(elf_omega, elf_q, elf_data,
 
 	Returns:
 	 - Inverse mean free path, same length as K
+	 - Stopping power, same length as K
 	 - ICDF for energy loss, shape (len(K) × len(P_omega))
 	 - 2D ICDF for momentum transfer, shape (len(K) × n_omega_q × len(P_q))
 	"""
@@ -130,11 +131,12 @@ def compile_full_imfp_icdf(elf_omega, elf_q, elf_data,
 	dcs_data = q_part(eval_omega, eval_q)
 
 	inel_imfp = np.zeros(K.shape) * units('nm^-1')
+	inel_sp = np.zeros(K.shape) * units('eV/nm')
 	inel_omega_icdf = np.zeros((K.shape[0], P_omega.shape[0])) * K_units
 	inel_q_2dicdf = np.zeros((K.shape[0], n_omega_q, P_q.shape[0])) * q_units
 
 	for i, E in enumerate(K):
-		tcs, omega_icdf, q_2dicdf = tcs_2dicdf(
+		tcs, sp, omega_icdf, q_2dicdf = tcs_2dicdf(
 			dcs_data[eval_omega<E-F,:],
 			eval_omega[eval_omega < E-F], eval_q,
 			lambda omega : q_k(E) - q_k(np.maximum(0*units.eV, E-omega)),
@@ -143,14 +145,16 @@ def compile_full_imfp_icdf(elf_omega, elf_q, elf_data,
 			np.linspace(0, (E-F).to(K_units).magnitude, n_omega_q)*K_units,
 			P_q);
 		tcs /= np.pi * units.a_0 * .5*(1 - 1 / (E/mc2 + 1)**2) * mc2
+		sp /= np.pi * units.a_0 * .5*(1 - 1 / (E/mc2 + 1)**2) * mc2
 
 		inel_imfp[i] = tcs.to('nm^-1')
+		inel_sp[i] = sp.to('eV/nm')
 		inel_omega_icdf[i] = omega_icdf.to('eV')
 		inel_q_2dicdf[i] = q_2dicdf.to('nm^-1')
 		print('.', end='', flush=True)
 	print()
 
-	return inel_imfp, inel_omega_icdf, inel_q_2dicdf
+	return inel_imfp, inel_sp, inel_omega_icdf, inel_q_2dicdf
 
 
 def tcs_2dicdf(function_data, # Cumulative integral of ELF over dq/q
@@ -172,9 +176,10 @@ def tcs_2dicdf(function_data, # Cumulative integral of ELF over dq/q
 
 	This function returns:
 	  1. The total cross section, ∫dω ∫dq/q Im[1/ε]
-	  2. The ICDF for ω, for each P in P1d_axis.
-	  3. The ICDF for q given ω. First index is ω, from axis x2d_axis; second
-		 index is P, from P2d_axis.
+	  2. The stopping power, ∫dω ω ∫dq/q Im[1/ε]
+	  3. The ICDF for ω, for each P in P1d_axis.
+	  4. The ICDF for q given ω. First index is ω, from axis x2d_axis; second
+	     index is P, from P2d_axis.
 	"""
 
 	# Indices for integration boundaries
@@ -194,6 +199,7 @@ def tcs_2dicdf(function_data, # Cumulative integral of ELF over dq/q
 	if total_cs <= 0:
 		return (
 			0 * eval_x.units,
+			0 * eval_x.units * eval_x.units,
 			np.zeros(len(P_x)) * eval_x.units,
 			np.zeros((len(x2d_axis), len(P_y))) * eval_y.units
 		)
@@ -231,7 +237,13 @@ def tcs_2dicdf(function_data, # Cumulative integral of ELF over dq/q
 		cdf = (1 - frac)*cdf1.clip(0, 1) + frac*cdf2.clip(0, 1)
 		icdf_yx[j,:] = icdf(eval_y, cdf, P_y)
 
+	# Stopping power
+	SP = trapz(eval_x.magnitude *
+		(function_data[range(len(eval_x)),yi_high] - function_data[range(len(eval_x)),yi_low]),
+		eval_x.magnitude)
+
 	return (
 		total_cs * eval_x.units,
+		SP * eval_x.units * eval_x.units,
 		icdf_x,
 		icdf_yx)
