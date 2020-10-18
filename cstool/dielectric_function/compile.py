@@ -181,6 +181,13 @@ def tcs_2dicdf(function_data, # Cumulative integral of ELF over dq/q
 	  4. The ICDF for q given ω. First index is ω, from axis x2d_axis; second
 	     index is P, from P2d_axis.
 	"""
+	if len(eval_x) == 0:
+		return (
+			0 * eval_x.units,
+			0 * eval_x.units * eval_x.units,
+			np.zeros(len(P_x)) * eval_x.units,
+			np.zeros((len(x2d_axis), len(P_y))) * eval_y.units
+		)
 
 	# Indices for integration boundaries
 	yi_low = np.searchsorted(eval_y.magnitude, y_low_f(eval_x).to(eval_y.units).magnitude)
