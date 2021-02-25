@@ -1,6 +1,6 @@
 cstool changelog
 
-1.0.3
+1.0.3 (2021-02-25)
   - Fix error when low-energy optical data is lacking
 
 1.0.2 (2020-08-04)
