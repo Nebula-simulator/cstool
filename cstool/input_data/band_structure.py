@@ -39,6 +39,19 @@ class band_structure:
 
 		return self.valence + .5 * self.band_gap
 
+	def get_min_excitation(self):
+		"""Get the minimum energy where an electron can excite a secondary
+		electron.
+
+		For metals, this is the Fermi energy.
+		For semiconductors and insulators, this is the bottom of the conduction
+		band plus the band gap, because both the primary and secondary electron
+		must be in the conduction band after the event.
+		"""
+		if self.model == 'metal':
+				return self.fermi
+		return self.valence + 2 * self.band_gap
+
 	def get_barrier(self):
 		"""Get the "inner potential" for this material."""
 		if self.model == 'metal':

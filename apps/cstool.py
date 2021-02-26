@@ -87,7 +87,7 @@ def compile_full_penn(outfile, material_params,
 	imfp, sp, omega_icdf, q_2dicdf = compile_full_imfp_icdf(
 		omega, q, elf,
 		K, P_omega, n_omega_q, P_q,
-		material_params.band_structure.get_fermi())
+		material_params.band_structure.get_min_excitation())
 
 	group = outfile.create_group("/full_penn")
 	group.add_scale("energy", K, 'eV')
@@ -170,7 +170,7 @@ def main():
 		# Full Penn
 		compile_full_penn(outfile, s,
 			np.geomspace(
-				s.band_structure.get_fermi().to(units.eV).magnitude+0.1, \
+				s.band_structure.get_min_excitation().to(units.eV).magnitude+0.1, \
 				max_energy.to(units.eV).magnitude,
 				128) * units.eV,
 			np.linspace(0.0, 1.0, 512),
