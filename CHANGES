@@ -1,5 +1,8 @@
 cstool changelog
 
+1.0.4
+  - Fix numerical issue with low momentum transfers in Penn model
+
 1.0.3 (2021-02-25)
   - Fix error when low-energy optical data is lacking
 

@@ -125,7 +125,7 @@ def compile_full_imfp_icdf(elf_omega, elf_q, elf_data,
 		(K[-1]-F).to(K_units).magnitude,
 		10000) * K_units
 	eval_q = np.geomspace(
-		q_k(elf_omega[0]).to(q_units).magnitude,
+		(q_k(K[-1]) - q_k(K[-1]-elf_omega[0])).to(q_units).magnitude,
 		2*q_k(K[-1]).to(q_units).magnitude,
 		10000) * q_units
 	dcs_data = q_part(eval_omega, eval_q)
