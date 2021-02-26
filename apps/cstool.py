@@ -134,7 +134,7 @@ def main():
 	#
 	# Compute cross sections and write to file
 	#
-	with datafile("{}.mat.hdf5".format(s.name), 'w') as outfile:
+	with datafile("{}.mat".format(s.name), 'w') as outfile:
 		outfile.set_property('cstool_version', cst.__version__)
 		outfile.set_property('name', s.name)
 		outfile.set_property('conductor_type', s.band_structure.model)
