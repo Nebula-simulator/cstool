@@ -1,6 +1,6 @@
 cstool changelog
 
-1.0.4
+1.0.4 (2021-02-26)
   - Fix numerical issue with low momentum transfers in Penn model
   - Use correct lower bound for secondary electron excitation in semiconductors and insulators
   - Use .mat file extension instead of double .mat.hdf5.
