@@ -1,5 +1,8 @@
 cstool changelog
 
+1.0.5
+  - Use correct lower bound for secondary electron excitation in semiconductors and insulators -- but properly this time
+
 1.0.4 (2021-02-26)
   - Fix numerical issue with low momentum transfers in Penn model
   - Use correct lower bound for secondary electron excitation in semiconductors and insulators

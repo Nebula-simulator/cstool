@@ -50,7 +50,7 @@ class band_structure:
 		"""
 		if self.model == 'metal':
 				return self.fermi
-		return self.valence + 2 * self.band_gap
+		return self.valence + self.band_gap
 
 	def get_barrier(self):
 		"""Get the "inner potential" for this material."""
