@@ -5,7 +5,7 @@ from .endf_data import reaction, atomic_relaxation
 
 class endf_reader:
 	"""ENDF-6 format reader.
-	See https://www.nndc.bnl.gov/csewg/docs/endf-manual.pdf for the specification.
+	See https://www.nndc.bnl.gov/endfdocs/ENDF-102-2018.pdf for the specification.
 
 	Only (MF=1, MT=451), MF=23, MF=26 are implemented.
 
