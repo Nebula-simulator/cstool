@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
 	name = 'cstool',
-	version = '1.0.6',
+	version = '1.0.7',
 	description = 'Computes cross sections for the Nebula simulator',
 	packages = ['cstool',
 		'cstool.common', 'cstool.dielectric_function', 'cstool.endf',
