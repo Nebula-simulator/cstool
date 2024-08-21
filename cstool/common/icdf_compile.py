@@ -1,6 +1,6 @@
 import numpy as np
 from cstool.common import units
-from scipy.integrate import trapz, cumtrapz
+from scipy.integrate import trapezoid, cumulative_trapezoid
 
 def icdf(x, cdf, P):
 	"""Compute the Inverse Cumulative Distribution Function (ICDF), given the
@@ -32,7 +32,7 @@ def compute_tcs_icdf(f, P, eval_x):
 	eval_x *= units.dimensionless
 	y = f(eval_x) * units.dimensionless
 
-	cf = np.r_[0, cumtrapz(y.magnitude, eval_x.magnitude)] * y.units*eval_x.units
+	cf = np.r_[0, cumulative_trapezoid(y.magnitude, eval_x.magnitude)] * y.units*eval_x.units
 
 	if cf[-1] <= 0*cf.units:
 		return 0*cf.units, np.zeros_like(P) * eval_x.units
@@ -48,4 +48,4 @@ def compute_tcs(f, eval_x):
 	"""
 	eval_x *= units.dimensionless
 	y = f(eval_x) * units.dimensionless
-	return trapz(y.magnitude, eval_x.magnitude) * y.units * eval_x.units
+	return trapezoid(y.magnitude, eval_x.magnitude) * y.units * eval_x.units

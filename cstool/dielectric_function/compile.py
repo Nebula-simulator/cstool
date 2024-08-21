@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.integrate import trapz, cumtrapz
+from scipy.integrate import trapezoid, cumulative_trapezoid
 from cstool.common import units
 from cstool.common.icdf_compile import icdf, compute_tcs_icdf
 
@@ -116,7 +116,7 @@ def compile_full_imfp_icdf(elf_omega, elf_q, elf_data,
 			elf(eval_omega[:,np.newaxis], eval_q),
 			eval_q.magnitude)
 		for i in range(len(eval_omega)):
-			dcs_data[i,1:] = cumtrapz(dcs_data[i,:], eval_q.magnitude)
+			dcs_data[i,1:] = cumulative_trapezoid(dcs_data[i,:], eval_q.magnitude)
 			dcs_data[i,0] = 0
 		return dcs_data
 
@@ -196,7 +196,7 @@ def tcs_2dicdf(function_data, # Cumulative integral of ELF over dq/q
 	# CIx[i] = ∫_{eval_x[0]}^{eval_x[i]} dx' ∫_{y_low(x')}^{y_high(x')} dy' f(x', y')
 	#        = ∫_{eval_x[0]}^{eval_x[i]} dx' CIy_x[x', -1]
 	CIx = np.zeros(len(eval_x))
-	CIx[1:] = cumtrapz(
+	CIx[1:] = cumulative_trapezoid(
 		function_data[range(len(eval_x)),yi_high] - function_data[range(len(eval_x)),yi_low],
 		eval_x.magnitude)
 
@@ -245,7 +245,7 @@ def tcs_2dicdf(function_data, # Cumulative integral of ELF over dq/q
 		icdf_yx[j,:] = icdf(eval_y, cdf, P_y)
 
 	# Stopping power
-	SP = trapz(eval_x.magnitude *
+	SP = trapezoid(eval_x.magnitude *
 		(function_data[range(len(eval_x)),yi_high] - function_data[range(len(eval_x)),yi_low]),
 		eval_x.magnitude)
 

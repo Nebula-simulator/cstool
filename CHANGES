@@ -1,5 +1,8 @@
 cstool changelog
 
+1.0.7
+  - Update deprecated dependencies
+
 1.0.6 (2022-02-05)
   - Fix URLs to NNDC
 

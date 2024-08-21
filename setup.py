@@ -17,6 +17,6 @@ setup(
 		'data/endf_data/atomic_relax.zip',
 		'data/endf_data/electrons.zip',
 		'data/endf_data/photoat.zip']},
-	install_requires = ['numpy', 'scipy', 'pyyaml', 'h5py', 'numba', 'pint>=0.11'],
+	install_requires = ['numpy', 'scipy', 'pyyaml', 'h5py', 'numba', 'pint>=0.11', 'setuptools'],
 	entry_points = {'console_scripts': ['cstool = cstool.apps.cstool:main']},
 )
